@@ -138,13 +138,12 @@ fn NevadaTestSite(){
 //use cgmath::{vec3, quat, mat4};
 
 use cgmath::Vector3;
+type point3 = Vector3<f32>;
+type color = Vector3<f32>;
+type vec3 = Vector3<f32>;
 
 fn testingCgmath(){
     
-    //type point3 = cgmath::vector::Vector3;
-    type point3 = Vector3;
-    //type color = Vector3;
-
     let myVec = cgmath::Vector3{x:1,y:1,z:1};
     let vec2 = myVec * 2 + myVec;
     println!("{:?}", vec2);
@@ -187,6 +186,16 @@ fn learningSample(){
 
 use std::io::Write; //to flush stdout
 
+fn write_color(image_ascii_data: String, pixel_color: color) {
+        
+}
+
+struct Ray{
+        origin: point3,
+        dir: vec3,
+        
+}
+
 fn main() -> std::io::Result<()> {
 
     //testing();
@@ -194,7 +203,7 @@ fn main() -> std::io::Result<()> {
 
     //learningSample();
 
-    /*let image_width: i32 = 256; 
+    let image_width: i32 = 256; 
     let image_height = 256;
 
     let mut file = File::create("image.ppm")?;
@@ -226,7 +235,7 @@ fn main() -> std::io::Result<()> {
     }
 
     //let wtfType = b"Hello, world!";
-    file.write_all(image_ascii_data.as_bytes())?;*/
+    file.write_all(image_ascii_data.as_bytes())?;
     Ok(())
 }
 
