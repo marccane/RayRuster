@@ -1,20 +1,21 @@
 #![allow(unused_variables)]
 #![allow(unused_imports)]
 
-//use cgmath::prelude::*;
 //use std::{thread, time};
 use std::io;
-
 use std::fs::File;
 use std::io::prelude::*;
-
 use std::io::Write; //to flush stdout
 
+use cgmath::prelude::*;
 //use cgmath::{vec3, quat, mat4};
+//use cgmath::structure::InnerSpace; //nope
+//use cgmath::BaseFloat;
+//use cgmath::prelude::InnerSpace;
+use cgmath::Vector3;
 
 mod testing;
 
-use cgmath::Vector3;
 type Point3 = Vector3<f32>;
 type Color = Vector3<f32>;
 type Vec3 = Vector3<f32>;
@@ -31,6 +32,7 @@ impl Ray {
         self.origin + t*self.dir
     }
 }
+
 
 fn testing_cgmath(){
     
@@ -55,8 +57,8 @@ fn write_color(image_ascii_data: String, pixel_color: Color) {
 fn ray_color(r: Ray) -> Color {
     //let unit_direction: Vec3 = r.dir.normalize();
     //let test: Vector3<f64> = Vector3::new(1.0,1.0,1.0);
-    //let test: Vector3<f64> = Vector3::new(1.0,1.0,1.0);
-    //let t2 = test.normalize();
+    let test: Vector3<f64> = Vector3::new(1.0,1.0,1.0);
+    let t2 = test.normalize();
     //let boxed = Box::new(Vector3::new(1.0,1.0,1.0)); //: std::boxed::Box<cgmath::vector::Vector3<f64>>
     //let t3 = boxed.normalize();
 
@@ -64,6 +66,7 @@ fn ray_color(r: Ray) -> Color {
 
     Color::new(1.0,1.0,1.0)
 }
+
 
 fn main() -> std::io::Result<()> {
 
