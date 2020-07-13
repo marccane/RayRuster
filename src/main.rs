@@ -22,9 +22,8 @@ type Color = Vector3<f32>;
 type Vec3 = Vector3<f32>;
 
 pub struct Ray {
-    pub origin: Point3,
-    pub dir: Vec3,
-    //pub test: Vector3<f32>,
+    origin: Point3,
+    dir: Vec3,
 }
 
 impl Ray {
@@ -90,9 +89,12 @@ fn ray_color(r: Ray) -> Color {
 }
 
 fn main() -> std::io::Result<()> {
-    testing::testing();
-    //testing_cgmath();
 
+    let settings = Settings::new();
+    let ray_depth = process_cli_parameters();
+
+    //testing::testing();
+    //testing_cgmath();
     //learningSample();
 
     const ASPECT_RATIO: f32 = 16.0 / 9.0;
@@ -125,16 +127,6 @@ fn main() -> std::io::Result<()> {
         //println!("\rScanlines remaining: {} ", j); //commented out while the \r thing doesn't work
         std::io::stdout().flush().expect("error flushing stdout");
         for i in 0..image_width {
-            /*let r = i as f64 / (image_width-1) as f64;
-            let g = j as f64 / (image_width-1) as f64;
-            let b = 0.25;
-
-            let ir = (255.999 * r) as u8;
-            let ig = (255.999 * g) as u8;
-            let ib = (255.999 * b) as u8;
-
-            let pixel_color = Vec3::new(i as f32 / ((image_width-1) as f32), j as f32 / ((image_height-1) as f32), 0.25);
-            */
 
             let u = i as f32 / (image_width - 1) as f32;
             let v = j as f32 / (image_height - 1) as f32;
@@ -163,13 +155,6 @@ impl Settings{
             ray_depth: 1
         }
     }
-}
-
-fn main2(){
-    let settings = Settings::new();
-    let ray_depth = process_cli_parameters();
-
-    //Ja tens la depth de raytracing
 }
 
 fn process_cli_parameters() -> i8 {
