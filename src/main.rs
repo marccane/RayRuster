@@ -15,15 +15,15 @@ use cgmath::prelude::*;
 use cgmath::Vector3;
 
 mod testing;
+mod settings;
 
 type Point3 = Vector3<f32>;
 type Color = Vector3<f32>;
 type Vec3 = Vector3<f32>;
 
 pub struct Ray {
-    pub origin: Point3,
-    pub dir: Vec3,
-    //pub test: Vector3<f32>,
+    origin: Point3,
+    dir: Vec3,
 }
 
 impl Ray {
@@ -88,10 +88,21 @@ fn ray_color(r: Ray) -> Color {
     //let t4 = Vector3::new(0.0, 0.0, 0.0).normalize();
 }
 
-fn main() -> std::io::Result<()> {
-    testing::testing();
-    //testing_cgmath();
+fn process_cli_parameters() -> i8 {
+    match std::env::args().nth(1).expect("no raytracing depth given").parse::<i8>() {
+        Ok(depth) => if depth < 1 { 1 } else { depth },
+        Err(e) => 1,
+    }
+}
 
+fn main() -> std::io::Result<()> {
+
+    let mut settings = settings::Settings::new();
+    let ray_depth = process_cli_parameters();
+    settings.ray_depth = ray_depth;
+
+    //testing::testing();
+    //testing_cgmath();
     //learningSample();
 
     const ASPECT_RATIO: f32 = 16.0 / 9.0;
@@ -124,16 +135,6 @@ fn main() -> std::io::Result<()> {
         //println!("\rScanlines remaining: {} ", j); //commented out while the \r thing doesn't work
         std::io::stdout().flush().expect("error flushing stdout");
         for i in 0..image_width {
-            /*let r = i as f64 / (image_width-1) as f64;
-            let g = j as f64 / (image_width-1) as f64;
-            let b = 0.25;
-
-            let ir = (255.999 * r) as u8;
-            let ig = (255.999 * g) as u8;
-            let ib = (255.999 * b) as u8;
-
-            let pixel_color = Vec3::new(i as f32 / ((image_width-1) as f32), j as f32 / ((image_height-1) as f32), 0.25);
-            */
 
             let u = i as f32 / (image_width - 1) as f32;
             let v = j as f32 / (image_height - 1) as f32;
@@ -151,22 +152,3 @@ fn main() -> std::io::Result<()> {
     file.write_all(image_ascii_data.as_bytes())?;
     Ok(())
 }
-
-mod settings;
-
-fn main2() {
-    let mut settings = settings::Settings::new();
-    let ray_depth = process_cli_parameters();
-    settings.ray_depth = ray_depth;
-
-    //Ja tens la depth de raytracing
-}
-
-fn process_cli_parameters() -> i8 {
-    match std::env::args().nth(1).expect("no raytracing depth given").parse::<i8>() {
-        Ok(depth) => if depth < 1 { 1 } else { depth },
-        Err(e) => 1,
-    }
-}
-
-
