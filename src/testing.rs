@@ -1,8 +1,8 @@
-use std::io;
 use rand::Rng;
 use std::cmp::Ordering;
+use std::io;
 
-pub fn testing(){
+pub fn testing() {
     // slicing a Vec
     let vec = vec![1, 2, 3];
     let int_slice = &vec[..];
@@ -10,14 +10,14 @@ pub fn testing(){
     let str_slice: &[&str] = &["one", "two", "three"];
 
     /*Slices are either mutable or shared. The shared slice type is &[T], while the mutable slice type is &mut [T],
-     where T represents the element type. For example, you can mutate the block of memory that a mutable slice points to:*/
+    where T represents the element type. For example, you can mutate the block of memory that a mutable slice points to:*/
 
     let x = &mut [1, 2, 3];
     let mut _y = &[2, 3, 4];
-    
+
     x[2] = 5; //yep
-    //y[2] = 1; //nope
-    _y = &[3,4,5];//[x[2],x[1],x[0]];
+              //y[2] = 1; //nope
+    _y = &[3, 4, 5]; //[x[2],x[1],x[0]];
 
     let isequal = x == &[1, 2, 5];
     println!("result {}", isequal);
@@ -25,8 +25,8 @@ pub fn testing(){
     x[1] = 7;
     assert_eq!(x, &[1, 7, 5]);
 
-    for i in _y{
-        println!("{} ", i);    
+    for i in _y {
+        println!("{} ", i);
     }
 
     let numbers = &[0, 1, 2];
@@ -38,20 +38,23 @@ pub fn testing(){
     for score in &mut scores[..] {
         *score += 1;
     }
-    
+
     //aixo té tipus &[i32]
     let slice = &numbers[0..2]; //sense & dona error diguent que ha de saber el tamany en compile time...
 
-    println!("magia: {:?}", (&vec, int_slice, str_slice, x, _y, numbers, scores, slice));
+    println!(
+        "magia: {:?}",
+        (&vec, int_slice, str_slice, x, _y, numbers, scores, slice)
+    );
 
-    //let multypearrtest = [1,'a',"hola"]; //nope 
+    //let multypearrtest = [1,'a',"hola"]; //nope
     //amb {} tampoc va
-    let _multypearrtest = (1,'a',"hola");
+    let _multypearrtest = (1, 'a', "hola");
     //let multypearrtest2 = [2.0,2]; //lmao no li coles res
 
-    let explicitTypedArr: [i32; 4] = [7,7,7,7];
+    let explicitTypedArr: [i32; 4] = [7, 7, 7, 7];
     let mut arrCpy = explicitTypedArr;
-    arrCpy = [1,2,3,4];
+    arrCpy = [1, 2, 3, 4];
     let numbar = arrCpy[3];
 
     let numbar = 34; //shadowing
@@ -59,13 +62,13 @@ pub fn testing(){
     const _lolconst: u32 = 25; //s'ha despecificar el tipus
     const _operacioConst: u32 = _lolconst + 10;
     const _resultat: i32 = constFn(); //nomes funcions const (constexpr???)
-    
+
     let flotadorStrang = 123_45_6.7_8_9;
     println!("flotadorStrang: {:?}", flotadorStrang);
 
-    let tup = (123, 4_5_6, 56.78, "zup mate", '%', [1.1,2.2,3.3]);
-    let typedTup: (i32, u16, &str, [u32;2]) = (-4,5,"hola", [3,3]);
-    let (a,b,c,_) = typedTup; //yeaboi
+    let tup = (123, 4_5_6, 56.78, "zup mate", '%', [1.1, 2.2, 3.3]);
+    let typedTup: (i32, u16, &str, [u32; 2]) = (-4, 5, "hola", [3, 3]);
+    let (a, b, c, _) = typedTup; //yeaboi
     println!("typedTup: {:?}", typedTup);
 
     let firstEl = tup.0;
@@ -76,7 +79,8 @@ pub fn testing(){
 
     let exprResult = {
         let mut x = 2.3;
-        for i in 1..=20 { //20 iteracions, el simbol '=' determina que és inclusiu
+        for i in 1..=20 {
+            //20 iteracions, el simbol '=' determina que és inclusiu
             x *= 1.4;
         }
         x //no ;
@@ -89,7 +93,8 @@ pub fn testing(){
     let i = 10;
     println!("factorial({}) = {}", i, fact(i));
 
-    for i in (2..9).rev(){ // 8->2
+    for i in (2..9).rev() {
+        // 8->2
         print!("{} ", i);
     }
     println!();
@@ -101,74 +106,73 @@ pub fn testing(){
         *x *= 2;
     }
 
-    println!("{:?}",vec_test);
+    println!("{:?}", vec_test);
 
     let mut test: Vec<i32>;
     let mut tuple_array = vec![]; //Vec::<(i32, i32)>;
     for (idx, elem) in vec_test.iter().enumerate() {
-        tuple_array.push((elem, idx, idx+1));
+        tuple_array.push((elem, idx, idx + 1));
     }
     println!("{:?}", tuple_array);
-
 }
 
 fn fact(i: i32) -> i32 {
-if i == 0 { 1 } else { i * fact(i-1) }
-}
-
-const fn constFn() -> i32{ //oh shit no has de fer forward declarations de les funcions, infact no has de fer forward declarations de res, que curios eh?
-77
-}
-
-fn NevadaTestSite(){
-    unsafe{
-
+    if i == 0 {
+        1
+    } else {
+        i * fact(i - 1)
     }
 }
 
-fn learningSample(){
-println!("Guess the number!");
+const fn constFn() -> i32 {
+    //oh shit no has de fer forward declarations de les funcions, infact no has de fer forward declarations de res, que curios eh?
+    77
+}
 
-let secret_number = rand::thread_rng().gen_range(1, 101);
+fn NevadaTestSite() {
+    unsafe {}
+}
 
-loop {
-    println!("Please input your guess.");
+fn learningSample() {
+    println!("Guess the number!");
 
-    let mut guess = String::new();
+    let secret_number = rand::thread_rng().gen_range(1, 101);
 
-    io::stdin()
-        .read_line(&mut guess)
-        .expect("Failed to read line");
+    loop {
+        println!("Please input your guess.");
 
-    let guess: u32 = match guess.trim().parse() {
-        Ok(num) => num,
-        Err(_) => continue,
-    };
+        let mut guess = String::new();
 
-    println!("You guessed: {}", guess);
+        io::stdin()
+            .read_line(&mut guess)
+            .expect("Failed to read line");
 
-    match guess.cmp(&secret_number) {
-        Ordering::Less => println!("Too small!"),
-        Ordering::Greater => println!("Too big!"),
-        Ordering::Equal => {
-            println!("You win!");
-            break;
+        let guess: u32 = match guess.trim().parse() {
+            Ok(num) => num,
+            Err(_) => continue,
+        };
+
+        println!("You guessed: {}", guess);
+
+        match guess.cmp(&secret_number) {
+            Ordering::Less => println!("Too small!"),
+            Ordering::Greater => println!("Too big!"),
+            Ordering::Equal => {
+                println!("You win!");
+                break;
+            }
         }
     }
 }
 
-}
-
-trait Knero{
+trait Knero {
     fn lmoile(&self);
 }
 
 struct Knaci();
 
 impl Knero for Knaci {
-    fn lmoile(&self) {
-        
-    }
+    fn lmoile(&self) {}
 }
 
 pub struct Arbre {
