@@ -2,6 +2,7 @@
 #![allow(unused_imports)]
 
 //use std::{thread, time};
+use std::env;
 use std::io;
 use std::fs::File;
 use std::io::prelude::*;
@@ -91,7 +92,7 @@ fn main() -> std::io::Result<()> {
     //learningSample();
 
     const ASPECT_RATIO: f32 = 16.0 / 9.0;
-    let image_width = 384; 
+    let image_width = 384;
     let image_height: i32 = (image_width as f32 / ASPECT_RATIO) as i32;
 
     let mut file = File::create("image.ppm")?;
@@ -142,4 +143,30 @@ fn main() -> std::io::Result<()> {
     //let wtfType = b"Hello, world!";
     file.write_all(image_ascii_data.as_bytes())?;
     Ok(())
+}
+
+struct Settings{
+    ray_depth: i8
+}
+
+impl Settings{
+    pub fn new() -> Settings {
+        Settings {
+            ray_depth: 1
+        }
+    }
+}
+
+fn main2(){
+    let settings = Settings::new();
+    let ray_depth = process_cli_parameters();
+
+    //Ja tens la depth de raytracing
+}
+
+fn process_cli_parameters() -> i8 {
+    match std::env::args().nth(1).expect("no raytracing depth given").parse::<i8>() {
+        Ok(depth) => if depth < 1 { 1 } else { depth },
+        Err(e) => 1,
+    }
 }
