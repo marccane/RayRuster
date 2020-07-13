@@ -58,21 +58,24 @@ fn write_color(image_ascii_data: &mut String, pixel_color: Color) {
     image_ascii_data.push_str(&format!("{} {} {}\n",ir,ig,ib));
 }
 
-fn hit_sphere(center: &Point3, radius: f32, ray: &Ray) -> bool {
+fn hit_sphere(center: &Point3, radius: f32, ray: &Ray) -> f32 {
     let oc = ray.origin - center;
     let a = ray.dir.dot(ray.dir);
     let b = 2.0 * oc.dot(ray.dir);
     let c = oc.dot(oc) - radius*radius;
     let discriminant = b*b - 4.0*a*c;
-    discriminant > 0.0
+    if discriminant < 0.0 {-1.0} else { (-b - discriminant.sqrt() ) / (2.0*a) }
 }
 
 fn ray_color(r: Ray) -> Color {
-    if hit_sphere(&Point3::new(0.0,0.0,-1.0), 0.5, &r) {
-        return Color::new(1.0,0.0,0.0);
+    let mut t = hit_sphere(&Point3::new(0.0,0.0,-1.0), 0.5, &r);
+     if t > 0.0 {
+        let N = (r.at(t) - Vec3::new(0.0,0.0,-1.0)).normalize();
+        return 0.5*Color::new(N.x+1.0,N.y+1.0,N.z+1.0);
+             //return Color::new(1.0,0.0,0.0);
     }
     let unit_direction: Vec3 = r.dir.normalize();
-    let t = 0.5*(unit_direction.y + 1.0); //mappejar l'intèrval [-1,1] a [0,1]
+    t = 0.5*(unit_direction.y + 1.0); //mappejar l'intèrval [-1,1] a [0,1]
     (1.0-t)*Color::new(1.0,1.0,1.0) + t*Color::new(0.5,0.7,1.0)
 
     //let test: Vector3<f64> = Vector3::new(1.0,1.0,1.0);
