@@ -152,21 +152,12 @@ fn main() -> std::io::Result<()> {
     Ok(())
 }
 
-struct Settings{
-    ray_depth: i8
-}
+mod settings;
 
-impl Settings{
-    pub fn new() -> Settings {
-        Settings {
-            ray_depth: 1
-        }
-    }
-}
-
-fn main2(){
-    let settings = Settings::new();
+fn main2() {
+    let mut settings = settings::Settings::new();
     let ray_depth = process_cli_parameters();
+    settings.ray_depth = ray_depth;
 
     //Ja tens la depth de raytracing
 }
@@ -177,3 +168,5 @@ fn process_cli_parameters() -> i8 {
         Err(e) => 1,
     }
 }
+
+
