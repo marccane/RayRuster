@@ -2,9 +2,10 @@
 #![allow(unused_imports)]
 
 //use std::{thread, time};
-use std::fs::File;
+use std::env;
 use std::io;
-use std::io::prelude::*;
+use std::fs::File;
+//use std::io::prelude::*;
 use std::io::Write; //to flush stdout
 
 use cgmath::prelude::*;
@@ -150,4 +151,30 @@ fn main() -> std::io::Result<()> {
     //let wtfType = b"Hello, world!";
     file.write_all(image_ascii_data.as_bytes())?;
     Ok(())
+}
+
+struct Settings{
+    ray_depth: i8
+}
+
+impl Settings{
+    pub fn new() -> Settings {
+        Settings {
+            ray_depth: 1
+        }
+    }
+}
+
+fn main2(){
+    let settings = Settings::new();
+    let ray_depth = process_cli_parameters();
+
+    //Ja tens la depth de raytracing
+}
+
+fn process_cli_parameters() -> i8 {
+    match std::env::args().nth(1).expect("no raytracing depth given").parse::<i8>() {
+        Ok(depth) => if depth < 1 { 1 } else { depth },
+        Err(e) => 1,
+    }
 }
