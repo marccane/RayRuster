@@ -2,7 +2,6 @@
 #![allow(unused_imports)]
 
 //use std::{thread, time};
-use std::env;
 use std::io;
 use std::fs::File;
 use std::io::prelude::*;
