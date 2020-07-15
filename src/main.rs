@@ -113,5 +113,14 @@ fn main() -> std::io::Result<()> {
     }
 
     file.write_all(image_ascii_data.as_bytes())?;
+
+    //henryTesting();
+
     Ok(())
 }
+/*
+use figures::Sphere;
+
+fn henryTesting() {
+    let mut sphere = Sphere::new();
+}*/
