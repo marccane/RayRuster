@@ -1,17 +1,13 @@
 #![allow(unused_variables)]
 #![allow(unused_imports)]
 
-//use std::{thread, time};
 use std::io;
 use std::fs::File;
 //use std::io::prelude::*;
 use std::io::Write; //to flush stdout
 
-use cgmath::prelude::*;
-//use cgmath::{vec3, quat, mat4};
-//use cgmath::structure::InnerSpace; //nope
-//use cgmath::BaseFloat;
-//use cgmath::prelude::InnerSpace;
+//use cgmath::prelude::*;
+use cgmath::prelude::InnerSpace;
 use cgmath::Vector3;
 
 mod testing;
@@ -28,28 +24,8 @@ pub struct Ray {
 
 impl Ray {
     fn at(&self, t: f32) -> Point3 {
-        //let stub = self.dir.normalize();
         self.origin + t * self.dir
     }
-}
-
-fn testing_cgmath() {
-    let my_vec = cgmath::Vector3 { x: 1, y: 1, z: 1 };
-    let vec2 = my_vec * 2 + my_vec;
-    println!("{:?}", vec2);
-
-    let v = cgmath::Vector3::new(1.0, 2.0, 3.0);
-
-    let pointerini = Point3::new(1.0, 1.0, 1.0);
-    let colorini = cgmath::Vector3 {
-        x: 1.0,
-        y: 1.1,
-        z: 1.2,
-    };
-
-    //let ray_test = Ray { origin: Point3::new(0.0, 0.0, 0.0), dir: Vec3::new(1.0, 1.0, 1.0) };
-
-    //let test = Vec3::new();
 }
 
 fn write_color(image_ascii_data: &mut String, pixel_color: Color) {
@@ -75,17 +51,13 @@ fn hit_sphere(center: &Point3, radius: f32, ray: &Ray) -> f32 {
 fn ray_color(r: Ray) -> Color {
     let mut t = hit_sphere(&Point3::new(0.0, 0.0, -1.0), 0.5, &r);
     if t > 0.0 {
-        let N = (r.at(t) - Vec3::new(0.0, 0.0, -1.0)).normalize();
-        return 0.5 * Color::new(N.x + 1.0, N.y + 1.0, N.z + 1.0);
-        //return Color::new(1.0,0.0,0.0);
+        let n = (r.at(t) - Vec3::new(0.0, 0.0, -1.0)).normalize();
+        return 0.5 * Color::new(n.x + 1.0, n.y + 1.0, n.z + 1.0);
     }
+
     let unit_direction: Vec3 = r.dir.normalize();
     t = 0.5 * (unit_direction.y + 1.0); //mappejar l'intèrval [-1,1] a [0,1]
     (1.0 - t) * Color::new(1.0, 1.0, 1.0) + t * Color::new(0.5, 0.7, 1.0)
-
-    //let test: Vector3<f64> = Vector3::new(1.0,1.0,1.0);
-    //let t2 = test.normalize();
-    //let t4 = Vector3::new(0.0, 0.0, 0.0).normalize();
 }
 
 fn process_cli_parameters() -> i8 {
@@ -101,21 +73,15 @@ fn main() -> std::io::Result<()> {
     let ray_depth = process_cli_parameters();
     settings.ray_depth = ray_depth;
 
-    //testing::testing();
-    //testing_cgmath();
-    //learningSample();
-
     const ASPECT_RATIO: f32 = 16.0 / 9.0;
     let image_width = 384;
     let image_height: i32 = (image_width as f32 / ASPECT_RATIO) as i32;
 
     let mut file = File::create("image.ppm")?;
     let mut image_ascii_data: String = "".to_owned();
-    //let borrowed: &str = "hola";
-    //let b2: &str = &image_width.to_string();
+
     let header = format!("P3\n{} {}\n255\n", image_width, image_height);
     image_ascii_data.push_str(&header);
-    //imageASCIIData +=  image_width.to_string();
 
     let viewport_height: f32 = 2.0;
     let viewport_width = ASPECT_RATIO * viewport_height;
@@ -126,8 +92,6 @@ fn main() -> std::io::Result<()> {
     let vertical = Vec3::new(0.0, viewport_height, 0.0);
     let lower_left_corner =
         origin - horitzontal / 2.0 - vertical / 2.0 - Vec3::new(0.0, 0.0, focal_length);
-
-    //let type_identifier: f64 = 1.2;
 
     //for j in image_height-1..=0 {
     for j in (0..image_height).rev() {
@@ -148,7 +112,6 @@ fn main() -> std::io::Result<()> {
         }
     }
 
-    //let wtfType = b"Hello, world!";
     file.write_all(image_ascii_data.as_bytes())?;
     Ok(())
 }

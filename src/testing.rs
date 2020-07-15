@@ -52,32 +52,32 @@ pub fn testing() {
     let _multypearrtest = (1, 'a', "hola");
     //let multypearrtest2 = [2.0,2]; //lmao no li coles res
 
-    let explicitTypedArr: [i32; 4] = [7, 7, 7, 7];
-    let mut arrCpy = explicitTypedArr;
-    arrCpy = [1, 2, 3, 4];
-    let numbar = arrCpy[3];
+    let explicit_typed_arr: [i32; 4] = [7, 7, 7, 7];
+    let mut arr_cpy = explicit_typed_arr;
+    arr_cpy = [1, 2, 3, 4];
+    let numbar = arr_cpy[3];
 
     let numbar = 34; //shadowing
 
-    const _lolconst: u32 = 25; //s'ha despecificar el tipus
-    const _operacioConst: u32 = _lolconst + 10;
-    const _resultat: i32 = constFn(); //nomes funcions const (constexpr???)
+    const _LOLCONST: u32 = const_fn() as u32; //s'ha despecificar el tipus
+    const _OPERACIO_CONST: u32 = _LOLCONST + 10;
+    const _RESULTAT: i32 = const_fn(); //nomes funcions const (constexpr???)
 
-    let flotadorStrang = 123_45_6.7_8_9;
-    println!("flotadorStrang: {:?}", flotadorStrang);
+    let flotador_strang = 123_45_6.7_8_9;
+    println!("flotadorStrang: {:?}", flotador_strang);
 
     let tup = (123, 4_5_6, 56.78, "zup mate", '%', [1.1, 2.2, 3.3]);
-    let typedTup: (i32, u16, &str, [u32; 2]) = (-4, 5, "hola", [3, 3]);
-    let (a, b, c, _) = typedTup; //yeaboi
-    println!("typedTup: {:?}", typedTup);
+    let typed_tup: (i32, u16, &str, [u32; 2]) = (-4, 5, "hola", [3, 3]);
+    let (a, b, c, _) = typed_tup; //yeaboi
+    println!("typedTup: {:?}", typed_tup);
 
-    let firstEl = tup.0;
-    let secondEl = tup.1;
+    let first_el = tup.0;
+    let second_el = tup.1;
 
-    let superArr: [i32; 5] = [7; 5]; // inicialitzar array de longitud 5 amb 7's
-    println!("superArr: {:?}", superArr);
+    let super_arr: [i32; 5] = [7; 5]; // inicialitzar array de longitud 5 amb 7's
+    println!("superArr: {:?}", super_arr);
 
-    let exprResult = {
+    let expr_result = {
         let mut x = 2.3;
         for i in 1..=20 {
             //20 iteracions, el simbol '=' determina que és inclusiu
@@ -85,7 +85,7 @@ pub fn testing() {
         }
         x //no ;
     };
-    println!("exprRes: {}", exprResult);
+    println!("exprRes: {}", expr_result);
 
     let a = 123;
     let b = a as i16;
@@ -114,6 +114,20 @@ pub fn testing() {
         tuple_array.push((elem, idx, idx + 1));
     }
     println!("{:?}", tuple_array);
+
+    let x = 12;
+    println!("fact({}) :{}", x, fact(x));
+
+    //let wtfType = b"Hello, world!";
+
+    nevada_test_site();
+
+    if false {
+        learning_sample();
+        testing_cgmath();
+    }
+
+    let stfu_compiler = Arbre{ num_fulles: 123, };
 }
 
 fn fact(i: i32) -> i32 {
@@ -124,16 +138,16 @@ fn fact(i: i32) -> i32 {
     }
 }
 
-const fn constFn() -> i32 {
+const fn const_fn() -> i32 {
     //oh shit no has de fer forward declarations de les funcions, infact no has de fer forward declarations de res, que curios eh?
     77
 }
 
-fn NevadaTestSite() {
+fn nevada_test_site() {
     unsafe {}
 }
 
-fn learningSample() {
+fn learning_sample() {
     println!("Guess the number!");
 
     let secret_number = rand::thread_rng().gen_range(1, 101);
@@ -163,6 +177,27 @@ fn learningSample() {
             }
         }
     }
+}
+
+use cgmath::{Point3};
+
+fn testing_cgmath() {
+    let my_vec = cgmath::Vector3 { x: 1, y: 1, z: 1 };
+    let vec2 = my_vec * 2 + my_vec;
+    println!("{:?}", vec2);
+
+    let v = cgmath::Vector3::new(1.0, 2.0, 3.0);
+
+    let pointerini = Point3::new(1.0, 1.0, 1.0);
+    let colorini = cgmath::Vector3 {
+        x: 1.0,
+        y: 1.1,
+        z: 1.2,
+    };
+
+    //let ray_test = Ray { origin: Point3::new(0.0, 0.0, 0.0), dir: Vec3::new(1.0, 1.0, 1.0) };
+
+    //let test = Vec3::new();
 }
 
 trait Knero {
