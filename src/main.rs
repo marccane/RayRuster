@@ -156,10 +156,8 @@ fn main() -> std::io::Result<()> {
     Ok(())
 }
 
-mod figures;
-
-use figures::sphere;
+use figures::Sphere;
 
 fn henryTesting() {
-    let mut sphere = sphere::Sphere::new();
+    let mut sphere = Sphere::new();
 }
