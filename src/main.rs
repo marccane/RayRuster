@@ -150,5 +150,16 @@ fn main() -> std::io::Result<()> {
 
     //let wtfType = b"Hello, world!";
     file.write_all(image_ascii_data.as_bytes())?;
+
+    henryTesting();
+
     Ok(())
+}
+
+mod figures;
+
+use figures::sphere;
+
+fn henryTesting() {
+    let mut sphere = sphere::Sphere::new();
 }
