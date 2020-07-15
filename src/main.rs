@@ -151,13 +151,13 @@ fn main() -> std::io::Result<()> {
     //let wtfType = b"Hello, world!";
     file.write_all(image_ascii_data.as_bytes())?;
 
-    henryTesting();
+    //henryTesting();
 
     Ok(())
 }
-
+/*
 use figures::Sphere;
 
 fn henryTesting() {
     let mut sphere = Sphere::new();
-}
+}*/
