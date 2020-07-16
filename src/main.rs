@@ -10,36 +10,17 @@ use std::io::Write; //to flush stdout
 use cgmath::prelude::InnerSpace;
 use cgmath::Vector3;
 
-//mod testing;
-//mod settings;
-//use testing::*;
 use rayruster::settings;
+use rayruster::raytracing::{Ray2, Vec3, Color2, Point32};
 
-use rayruster::raytracing::Vec3;
-
-type Point3 = Vector3<f32>;
-type Color = Vector3<f32>;
-
-
-pub struct Ray {
-    origin: Point3,
-    dir: Vec3,
-}
-
-impl Ray {
-    fn at(&self, t: f32) -> Point3 {
-        self.origin + t * self.dir
-    }
-}
-
-fn write_color(image_ascii_data: &mut String, pixel_color: Color) {
+fn write_color(image_ascii_data: &mut String, pixel_color: Color2) {
     let ir = (255.999 * pixel_color.x) as i32;
     let ig = (255.999 * pixel_color.y) as i32;
     let ib = (255.999 * pixel_color.z) as i32;
     image_ascii_data.push_str(&format!("{} {} {}\n", ir, ig, ib));
 }
 
-fn hit_sphere(center: &Point3, radius: f32, ray: &Ray) -> f32 {
+fn hit_sphere(center: &Point32, radius: f32, ray: &Ray2) -> f32 {
     let oc = ray.origin - center;
     let a = ray.dir.magnitude2();
     let half_b = oc.dot(ray.dir);
@@ -52,16 +33,16 @@ fn hit_sphere(center: &Point3, radius: f32, ray: &Ray) -> f32 {
     }
 }
 
-fn ray_color(r: Ray) -> Color {
-    let mut t = hit_sphere(&Point3::new(0.0, 0.0, -1.0), 0.5, &r);
+fn ray_color(r: Ray2) -> Color2 {
+    let mut t = hit_sphere(&Point32::new(0.0, 0.0, -1.0), 0.5, &r);
     if t > 0.0 {
         let n = (r.at(t) - Vec3::new(0.0, 0.0, -1.0)).normalize();
-        return 0.5 * Color::new(n.x + 1.0, n.y + 1.0, n.z + 1.0);
+        return 0.5 * Color2::new(n.x + 1.0, n.y + 1.0, n.z + 1.0);
     }
 
     let unit_direction: Vec3 = r.dir.normalize();
     t = 0.5 * (unit_direction.y + 1.0); //mappejar l'intèrval [-1,1] a [0,1]
-    (1.0 - t) * Color::new(1.0, 1.0, 1.0) + t * Color::new(0.5, 0.7, 1.0)
+    (1.0 - t) * Color2::new(1.0, 1.0, 1.0) + t * Color2::new(0.5, 0.7, 1.0)
 }
 
 fn process_cli_parameters() -> i8 {
@@ -91,7 +72,7 @@ fn main() -> std::io::Result<()> {
     let viewport_width = ASPECT_RATIO * viewport_height;
     let focal_length = 1.0;
 
-    let origin = Point3::new(0.0, 0.0, 0.0);
+    let origin = Point32::new(0.0, 0.0, 0.0);
     let horitzontal = Vec3::new(viewport_width, 0.0, 0.0);
     let vertical = Vec3::new(0.0, viewport_height, 0.0);
     let lower_left_corner =
@@ -106,7 +87,7 @@ fn main() -> std::io::Result<()> {
 
             let u = i as f32 / (image_width - 1) as f32;
             let v = j as f32 / (image_height - 1) as f32;
-            let r = Ray {
+            let r = Ray2 {
                 origin: origin,
                 dir: lower_left_corner + u * horitzontal + v * vertical - origin,
             };
