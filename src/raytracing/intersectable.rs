@@ -1,5 +1,5 @@
-use raytracing::{Ray2, Hit};
+use super::{Ray2, Point32};
 
 pub trait Intersectable {
-    fn intersect(ray: Ray2) -> Option<Hit>;
+    fn intersect(&self, ray: &Ray2) -> Option<Point32>;
 }

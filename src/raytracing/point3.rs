@@ -1,3 +1,3 @@
 use cgmath::Vector3;
 
-type Point32 = Vector3<f32>;
+pub type Point32 = Vector3<f32>;

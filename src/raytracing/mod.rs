@@ -1,5 +1,8 @@
 
-pub use hit::Hit;
+mod ray;
+mod intersectable;
+mod point3;
+mod color;
 
 pub use ray::Ray2;
 

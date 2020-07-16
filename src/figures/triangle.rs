@@ -1,4 +1,4 @@
-use raytracing::{Intersectable, Ray2, Hit, Point32};
+use crate::raytracing::{Intersectable, Ray2, Point32};
 
 pub struct Triangle {
     vertex_1: Point32,
@@ -6,17 +6,7 @@ pub struct Triangle {
     vertex_3: Point32,
 }
 
-impl Intersectable for Triangle {
-    
-    //Creates an equilateral Triangle of side sqrt(2)
-    fn new() -> Triangle {
-        Triangle{
-            vertex_1: Point32(1.0,0.0,0.0),
-            vertex_2: Point32(0.0,1.0,0.0),
-            vertex_3: Point32(0.0,0.0,1.0),
-        }
-    }
-
+impl Triangle {
     //Creates a Triangle given its three vertices.
     fn new(vertex1: Point32, vertex2: Point32, vertex3: Point32) -> Triangle {
         Triangle {
@@ -26,8 +16,20 @@ impl Intersectable for Triangle {
         }
     }
     
+    //Creates an equilateral Triangle of side sqrt(2)
+    fn new_default() -> Triangle {
+        Triangle::new(
+            Point32::new(1.0,0.0,0.0), 
+            Point32::new(0.0,1.0,0.0), 
+            Point32::new(0.0,0.0,1.0)
+        )
+    }
+}
+
+impl Intersectable for Triangle {
+
     //Computes the intersection of this figure with a given Ray, if any.
-    fn intersect(&self, ray: Ray2) -> Option<Hit> {
+    fn intersect(&self, ray: &Ray2) -> Option<Point32> {
         //TODO
         Option::None
     }
