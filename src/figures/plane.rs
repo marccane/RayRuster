@@ -1,4 +1,4 @@
-use crate::raytracing::{Intersectable, Ray2, Point32};
+use crate::raytracing::{Intersectable, Ray2, Point32, HitRecord};
 
 pub struct Plane {
     a: f32,
@@ -26,7 +26,7 @@ impl Plane {
 }
 
 impl Intersectable for Plane {
-    fn intersect(&self, ray: &Ray2) -> Option<Point32> {
+    fn intersect(&self, ray: &Ray2) -> Option<HitRecord> {
         //TODO
         Option::None
     }

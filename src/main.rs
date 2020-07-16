@@ -10,12 +10,16 @@ use std::io::Write; //to flush stdout
 use cgmath::prelude::InnerSpace;
 use cgmath::Vector3;
 
-mod testing;
-mod settings;
+//mod testing;
+//mod settings;
+//use testing::*;
+use rayruster::settings;
+
+use rayruster::raytracing::Vec3;
 
 type Point3 = Vector3<f32>;
 type Color = Vector3<f32>;
-type Vec3 = Vector3<f32>;
+
 
 pub struct Ray {
     origin: Point3,

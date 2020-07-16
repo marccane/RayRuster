@@ -1,4 +1,4 @@
-use crate::raytracing::{Intersectable, Ray2, Point32};
+use crate::raytracing::{Intersectable, Ray2, Point32, HitRecord};
 
 pub struct Triangle {
     vertex_1: Point32,
@@ -29,7 +29,7 @@ impl Triangle {
 impl Intersectable for Triangle {
 
     //Computes the intersection of this figure with a given Ray, if any.
-    fn intersect(&self, ray: &Ray2) -> Option<Point32> {
+    fn intersect(&self, ray: &Ray2) -> Option<HitRecord> {
         //TODO
         Option::None
     }
