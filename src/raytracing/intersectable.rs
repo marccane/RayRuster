@@ -1,5 +1,5 @@
-use super::{Ray2, Point32, HitRecord};
+use super::{Ray2, HitRecord};
 
 pub trait Intersectable {
-    fn intersect(&self, ray: &Ray2) -> Option<HitRecord>;
+    fn intersect(&self, ray: &Ray2, t_min: f32, t_max:f32) -> Option<HitRecord>;
 }

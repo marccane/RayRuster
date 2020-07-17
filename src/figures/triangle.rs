@@ -29,7 +29,7 @@ impl Triangle {
 impl Intersectable for Triangle {
 
     //Computes the intersection of this figure with a given Ray, if any.
-    fn intersect(&self, ray: &Ray2) -> Option<HitRecord> {
+    fn intersect(&self, ray: &Ray2, t_min: f32, t_max:f32) -> Option<HitRecord> {
         //TODO
         Option::None
     }

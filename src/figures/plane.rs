@@ -26,7 +26,7 @@ impl Plane {
 }
 
 impl Intersectable for Plane {
-    fn intersect(&self, ray: &Ray2) -> Option<HitRecord> {
+    fn intersect(&self, ray: &Ray2, t_min: f32, t_max:f32) -> Option<HitRecord> {
         //TODO
         Option::None
     }

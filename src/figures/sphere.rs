@@ -1,4 +1,4 @@
-use crate::raytracing::{Intersectable, Ray2, Point32, HitRecord};
+use crate::raytracing::{Intersectable, Vec3, Ray2, Point32, HitRecord};
 use cgmath::prelude::InnerSpace;
 
 pub struct Sphere {
@@ -24,19 +24,34 @@ impl Sphere {
 
 impl Intersectable for Sphere {
 
-    fn intersect(&self, ray: &Ray2) -> Option<HitRecord> {
+    fn intersect(&self, ray: &Ray2, t_min: f32, t_max:f32) -> Option<HitRecord> {
         let oc = ray.origin - self.center;
         let a = ray.dir.magnitude2();
         let half_b = oc.dot(ray.dir);
         let c = oc.magnitude2() - self.radius * self.radius;
         let discriminant = half_b*half_b - a*c;
 
-        if discriminant < 0.0 {
-            //-1.0
-        } else {
-            //(-half_b - discriminant.sqrt()) / a
-        }
+        if discriminant > 0.0 {
+            /*let mut t: f32;
+            let mut p: Point32;
+            let mut normal: Vec3;*/
+            
+            let mut res: Option<HitRecord> = Option::None;
 
-        Option::None
+            let root = discriminant.sqrt();
+            let mut temp = (-half_b - root)/a; //acabem de resoldre la equacio
+            if temp < t_max && temp > t_max {
+                let p = ray.at(temp);
+                res = Some(HitRecord{ t: temp, normal: (p - self.center) / self.radius, p: p});
+            }
+            temp = (-half_b + root)/a;
+            if temp > t_max && temp < t_max {
+                let p = ray.at(temp);
+                res = Some(HitRecord{ t: temp, normal: (p - self.center) / self.radius, p: p});
+            }
+            res
+        } else {
+            Option::None
+        }
     }
 }
