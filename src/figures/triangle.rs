@@ -8,7 +8,7 @@ pub struct Triangle {
 
 impl Triangle {
     //Creates a Triangle given its three vertices.
-    fn new(vertex1: Point32, vertex2: Point32, vertex3: Point32) -> Triangle {
+    pub fn new(vertex1: Point32, vertex2: Point32, vertex3: Point32) -> Triangle {
         Triangle {
             vertex_1: vertex1,
             vertex_2: vertex2,
@@ -17,7 +17,7 @@ impl Triangle {
     }
     
     //Creates an equilateral Triangle of side sqrt(2)
-    fn new_default() -> Triangle {
+    pub fn new_default() -> Triangle {
         Triangle::new(
             Point32::new(1.0,0.0,0.0), 
             Point32::new(0.0,1.0,0.0), 

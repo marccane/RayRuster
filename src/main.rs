@@ -10,8 +10,9 @@ use std::io::Write; //to flush stdout
 use cgmath::prelude::InnerSpace;
 use cgmath::Vector3;
 
+use rayruster::raytracing::{Ray2, Vec3, Color2, Point32, Intersectable};
+use rayruster::figures::*;
 use rayruster::settings;
-use rayruster::raytracing::{Ray2, Vec3, Color2, Point32};
 
 fn write_color(image_ascii_data: &mut String, pixel_color: Color2) {
     let ir = (255.999 * pixel_color.x) as i32;
@@ -20,29 +21,21 @@ fn write_color(image_ascii_data: &mut String, pixel_color: Color2) {
     image_ascii_data.push_str(&format!("{} {} {}\n", ir, ig, ib));
 }
 
-fn hit_sphere(center: &Point32, radius: f32, ray: &Ray2) -> f32 {
-    let oc = ray.origin - center;
-    let a = ray.dir.magnitude2();
-    let half_b = oc.dot(ray.dir);
-    let c = oc.magnitude2() - radius * radius;
-    let discriminant = half_b*half_b - a*c;
-    if discriminant < 0.0 {
-        -1.0
-    } else {
-        (-half_b - discriminant.sqrt()) / a
-    }
-}
-
 fn ray_color(r: Ray2) -> Color2 {
-    let mut t = hit_sphere(&Point32::new(0.0, 0.0, -1.0), 0.5, &r);
-    if t > 0.0 {
-        let n = (r.at(t) - Vec3::new(0.0, 0.0, -1.0)).normalize();
-        return 0.5 * Color2::new(n.x + 1.0, n.y + 1.0, n.z + 1.0);
-    }
+    let sphere = Sphere::new(Point32::new(0.0, 0.0, -1.0), 0.5);
+    let sphere_intersect = sphere.intersect(&r, 0.0, 100.0);
 
-    let unit_direction: Vec3 = r.dir.normalize();
-    t = 0.5 * (unit_direction.y + 1.0); //mappejar l'intèrval [-1,1] a [0,1]
-    (1.0 - t) * Color2::new(1.0, 1.0, 1.0) + t * Color2::new(0.5, 0.7, 1.0)
+    match sphere_intersect {
+        Some(hit_rec) => {        
+            let n = (r.at(hit_rec.t) - Vec3::new(0.0, 0.0, -1.0)).normalize();
+            0.5 * Color2::new(n.x + 1.0, n.y + 1.0, n.z + 1.0)
+        },
+        None => {
+            let unit_direction: Vec3 = r.dir.normalize();
+            let t = 0.5 * (unit_direction.y + 1.0); //mappejar l'intèrval [-1,1] a [0,1]
+            (1.0 - t) * Color2::new(1.0, 1.0, 1.0) + t * Color2::new(0.5, 0.7, 1.0)
+        }
+    }
 }
 
 fn process_cli_parameters() -> i8 {

@@ -9,7 +9,7 @@ pub struct Plane {
 
 impl Plane {
     //Creates a plane given its properties.
-    fn new(a: f32, b: f32, c: f32, d: f32) -> Plane {
+    pub fn new(a: f32, b: f32, c: f32, d: f32) -> Plane {
         Plane {
             a: a,
             b: b,
@@ -19,7 +19,7 @@ impl Plane {
     }
 
     //Creates a default Plane
-    fn new_default() -> Plane {
+    pub fn new_default() -> Plane {
         Plane::new(1.0, 1.0, 1.0, 0.0)
     }
 

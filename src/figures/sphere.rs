@@ -8,7 +8,7 @@ pub struct Sphere {
 
 impl Sphere {  
     //Creates a Sphere given its center and radius.
-    fn new(center: Point32, radius: f32) -> Sphere {
+    pub fn new(center: Point32, radius: f32) -> Sphere {
         Sphere {
             center: center,
             radius: radius,
@@ -16,7 +16,7 @@ impl Sphere {
     }
     
     //Creates a Sphere of radius 1 centered on the origin (0,0,0)
-    fn new_default() -> Sphere {
+    pub fn new_default() -> Sphere {
         Sphere::new(Point32::new(0.0,0.0,0.0), 1.0)
     }
 
@@ -32,20 +32,17 @@ impl Intersectable for Sphere {
         let discriminant = half_b*half_b - a*c;
 
         if discriminant > 0.0 {
-            /*let mut t: f32;
-            let mut p: Point32;
-            let mut normal: Vec3;*/
             
             let mut res: Option<HitRecord> = Option::None;
 
             let root = discriminant.sqrt();
-            let mut temp = (-half_b - root)/a; //acabem de resoldre la equacio
-            if temp < t_max && temp > t_max {
+            let mut temp = (-half_b - root)/a; //finish solving the equation
+            if temp < t_min && temp > t_max {
                 let p = ray.at(temp);
                 res = Some(HitRecord{ t: temp, normal: (p - self.center) / self.radius, p: p});
             }
             temp = (-half_b + root)/a;
-            if temp > t_max && temp < t_max {
+            if temp > t_min && temp < t_max {
                 let p = ray.at(temp);
                 res = Some(HitRecord{ t: temp, normal: (p - self.center) / self.radius, p: p});
             }
