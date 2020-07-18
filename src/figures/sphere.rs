@@ -38,13 +38,17 @@ impl Intersectable for Sphere {
             let root = discriminant.sqrt();
             let mut temp = (-half_b - root)/a; //finish solving the equation
             if temp < t_min && temp > t_max {
-                let p = ray.at(temp);
-                res = Some(HitRecord{ t: temp, normal: (p - self.center) / self.radius, p: p});
+                let mut hit_rec = HitRecord::new_with_point(ray.at(temp));
+                let outward_normal = (hit_rec.p - self.center) / self.radius;
+                hit_rec.set_face_normal(ray, outward_normal);
+                res = Some(hit_rec);
             }
             temp = (-half_b + root)/a;
             if temp > t_min && temp < t_max {
-                let p = ray.at(temp);
-                res = Some(HitRecord{ t: temp, normal: (p - self.center) / self.radius, p: p});
+                let mut hit_rec = HitRecord::new_with_point(ray.at(temp));
+                let outward_normal = (hit_rec.p - self.center) / self.radius;
+                hit_rec.set_face_normal(ray, outward_normal);
+                res = Some(hit_rec);
             }
             res
         } else {

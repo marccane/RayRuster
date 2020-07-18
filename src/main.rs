@@ -27,7 +27,7 @@ fn ray_color(r: Ray2) -> Color2 {
 
     match sphere_intersect {
         Some(hit_rec) => {        
-            let n = (r.at(hit_rec.t) - Vec3::new(0.0, 0.0, -1.0)).normalize();
+            let n = (hit_rec.p - Vec3::new(0.0, 0.0, -1.0)).normalize();
             0.5 * Color2::new(n.x + 1.0, n.y + 1.0, n.z + 1.0)
         },
         None => {
