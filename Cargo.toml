@@ -9,3 +9,4 @@ edition = "2018"
 [dependencies]
 cgmath = "0.17.0"
 rand = "0.5.5"
+pixel-canvas = "0.2.1"

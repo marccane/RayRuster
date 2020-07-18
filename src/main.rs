@@ -10,11 +10,13 @@ use std::io::Write; //to flush stdout
 use cgmath::prelude::InnerSpace;
 use cgmath::Vector3;
 
+use pixel_canvas::{Canvas, Color};
+
 use rayruster::raytracing::{Ray2, Vec3, Color2, Point32, Intersectable};
 use rayruster::figures::*;
 use rayruster::settings;
 
-fn write_color(image_ascii_data: &mut String, pixel_color: Color2) {
+fn write_color(image_ascii_data: &mut String, pixel_color: &Color2) {
     let ir = (255.999 * pixel_color.x) as i32;
     let ig = (255.999 * pixel_color.y) as i32;
     let ib = (255.999 * pixel_color.z) as i32;
@@ -38,18 +40,63 @@ fn ray_color(r: Ray2) -> Color2 {
     }
 }
 
-fn process_cli_parameters() -> i8 {
-    match std::env::args().nth(1).expect("no raytracing depth given").parse::<i8>() {
-        Ok(depth) => if depth < 1 { 1 } else { depth },
-        Err(e) => 1,
-    }
+fn process_cli_parameters() -> (settings::DisplayMode, i8, i16, i16) {
+    let display_mode: settings::DisplayMode = match std::env::args().nth(1) {
+        Some(r) => match r.as_str() {
+            "-w" => settings::DisplayMode::WINDOW,
+            "-f" => settings::DisplayMode::FILE,
+            _ => settings::DisplayMode::FILE,
+
+        },
+        None => settings::DisplayMode::FILE,
+    };
+    
+    let raytracing_depth: i8 = match std::env::args().nth(2) {
+        Some(r) => match r.parse::<i8>() {
+            Ok(depth) => if depth < 1 { settings::DEFAULT_RAYTRACING_DEPTH } else { depth },
+            Err(e) => settings::DEFAULT_RAYTRACING_DEPTH,
+        },
+        None => settings::DEFAULT_RAYTRACING_DEPTH,
+    };
+
+    let width: i16 = match std::env::args().nth(3) {   
+        Some(r) => match r.parse::<i16>() {
+            Ok(width) => if width < 1 { settings::DEFAULT_WIDTH } else { width },
+            Err(e) => settings::DEFAULT_WIDTH,
+        },
+        None => settings::DEFAULT_WIDTH,
+    };
+
+    let height: i16 = match std::env::args().nth(4) {
+        Some(r) => match r.parse::<i16>() {
+            Ok(height) => if height < 1 { settings::DEFAULT_HEIGHT } else { height },
+            Err(e) => settings::DEFAULT_HEIGHT,
+        },
+        None => settings::DEFAULT_HEIGHT,
+    };
+
+    (display_mode, raytracing_depth, width, height)
+}
+
+fn get_settings_from_run_parameters() -> settings::Settings {
+    let mut settings = settings::Settings::new();
+    
+    let (display_mode, ray_depth, width, height) = process_cli_parameters();
+    
+    settings.display_mode = display_mode;
+    settings.ray_depth = ray_depth;
+    settings.width = width;
+    settings.height = height;
+    
+    settings
 }
 
 fn main() -> std::io::Result<()> {
 
-    let mut settings = settings::Settings::new();
-    let ray_depth = process_cli_parameters();
-    settings.ray_depth = ray_depth;
+    // Settings retreive from run parameters.
+    let settings = get_settings_from_run_parameters();
+    let mut raytraced_color_buffer: Vec<Color2> = vec!();
+
 
     const ASPECT_RATIO: f32 = 16.0 / 9.0;
     let image_width = 384;
@@ -86,19 +133,40 @@ fn main() -> std::io::Result<()> {
             };
 
             let pixel_color = ray_color(r);
-            write_color(&mut image_ascii_data, pixel_color);
+            write_color(&mut image_ascii_data, &pixel_color);
+            raytraced_color_buffer.push(pixel_color);
         }
     }
 
     file.write_all(image_ascii_data.as_bytes())?;
+    
+    match settings.display_mode { 
+        settings::DisplayMode::WINDOW => {
+            let canvas = Canvas::new(image_width as usize, image_height as usize)
+            .title("RayRuster 0.7");
 
-    //henryTesting();
+            canvas.render(move |mouse, image| {
+                let width = image.width() as usize;
+                for (y, row) in image.chunks_mut(width).enumerate() {
+                    for (x, pixel) in row.iter_mut().enumerate() {
+                        let buffer = &raytraced_color_buffer;
+                        match buffer.get(image_width as usize * y + x) {
+                            Some(color) => {
+                                *pixel = pixel_canvas::Color {
+                                    r: (color.x*256.0) as u8,
+                                    g: (color.y*256.0) as u8,
+                                    b: (color.z*256.0) as u8,
+                                }
+                            }
+                            _ => (),
+                        };
+                    }
+                }
+            });
+        }
+        _ => (),
+    }
+    
 
     Ok(())
 }
-/*
-use figures::Sphere;
-
-fn henryTesting() {
-    let mut sphere = Sphere::new();
-}*/
