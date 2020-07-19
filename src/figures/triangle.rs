@@ -1,9 +1,9 @@
 use crate::raytracing::{Intersectable, Ray2, Point32, HitRecord};
 
 pub struct Triangle {
-    vertex_1: Point32,
-    vertex_2: Point32,
-    vertex_3: Point32,
+    pub vertex_1: Point32,
+    pub vertex_2: Point32,
+    pub vertex_3: Point32,
 }
 
 impl Triangle {

@@ -1,10 +1,10 @@
-use crate::raytracing::{Intersectable, Ray2, Point32, HitRecord};
+use crate::raytracing::{Intersectable, Ray2, HitRecord};
 
 pub struct Plane {
-    a: f32,
-    b: f32,
-    c: f32,
-    d: f32,
+    pub a: f32,
+    pub b: f32,
+    pub c: f32,
+    pub d: f32,
 }
 
 impl Plane {

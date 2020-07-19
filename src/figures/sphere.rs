@@ -1,9 +1,9 @@
-use crate::raytracing::{Intersectable, Vec3, Ray2, Point32, HitRecord};
+use crate::raytracing::{Intersectable, Ray2, Point32, HitRecord};
 use cgmath::prelude::InnerSpace;
 
 pub struct Sphere {
-    center: Point32,
-    radius: f32,
+    pub center: Point32,
+    pub radius: f32,
 }
 
 impl Sphere {  
@@ -38,21 +38,25 @@ impl Intersectable for Sphere {
             let root = discriminant.sqrt();
             let mut temp = (-half_b - root)/a; //finish solving the equation
             if temp < t_min && temp > t_max {
-                let mut hit_rec = HitRecord::new_with_point(ray.at(temp));
+                let p = ray.at(temp);
+                let mut hit_rec = HitRecord::new_with_point_and_t(p, temp);
                 let outward_normal = (hit_rec.p - self.center) / self.radius;
                 hit_rec.set_face_normal(ray, outward_normal);
-                res = Some(hit_rec);
+                return Some(hit_rec);
             }
             temp = (-half_b + root)/a;
             if temp > t_min && temp < t_max {
-                let mut hit_rec = HitRecord::new_with_point(ray.at(temp));
+                let p = ray.at(temp);
+                let mut hit_rec = HitRecord::new_with_point_and_t(p, temp);
                 let outward_normal = (hit_rec.p - self.center) / self.radius;
                 hit_rec.set_face_normal(ray, outward_normal);
-                res = Some(hit_rec);
+                return Some(hit_rec);
             }
-            res
+        }
+           /*res
         } else {
             Option::None
-        }
+        }*/
+        Option::None
     }
 }

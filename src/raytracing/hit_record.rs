@@ -7,13 +7,13 @@ use crate::raytracing::{Point32, Vec3, Ray2};
 pub struct HitRecord {
     pub p: Point32,
     pub normal: Vec3,
-    //pub t: f32,
+    pub t: f32,
     pub front_face: bool,
 }
 
 impl HitRecord {
-    pub fn new_with_point(p: Point32) -> HitRecord {
-        HitRecord{ p, normal: Vec3::new(0.0,0.0,0.0), front_face: false }
+    pub fn new_with_point_and_t(p: Point32, t: f32) -> HitRecord {
+        HitRecord{ p, normal: Vec3::new(0.0,0.0,0.0), t, front_face: false }
     }
 
     #[inline]

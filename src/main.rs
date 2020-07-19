@@ -10,9 +10,9 @@ use std::io::Write; //to flush stdout
 use cgmath::prelude::InnerSpace;
 use cgmath::Vector3;
 
-use rayruster::raytracing::{Ray2, Vec3, Color2, Point32, Intersectable};
+use rayruster::raytracing::{Ray2, Vec3, Color2, Point32, Intersectable, IntersectableList};
 use rayruster::figures::*;
-use rayruster::settings;
+use rayruster::{settings, utils::*};
 
 fn write_color(image_ascii_data: &mut String, pixel_color: Color2) {
     let ir = (255.999 * pixel_color.x) as i32;
@@ -21,17 +21,18 @@ fn write_color(image_ascii_data: &mut String, pixel_color: Color2) {
     image_ascii_data.push_str(&format!("{} {} {}\n", ir, ig, ib));
 }
 
-fn ray_color(r: Ray2) -> Color2 {
-    let sphere = Sphere::new(Point32::new(0.0, 0.0, -1.0), 0.5);
-    let sphere_intersect = sphere.intersect(&r, 0.0, 100.0);
+fn ray_color(r: Ray2, world: &dyn Intersectable) -> Color2 {
+    //let sphere = Sphere::new(Point32::new(0.0, 0.0, -1.0), 0.5);
+    let opt_hitrec = world.intersect(&r, 0.0, INFINITY);
 
-    match sphere_intersect {
+    match opt_hitrec {
         Some(hit_rec) => {        
-            let n = (hit_rec.p - Vec3::new(0.0, 0.0, -1.0)).normalize();
+            //let n = (hit_rec.p - Vec3::new(0.0, 0.0, -1.0)).normalize();
+            let n = hit_rec.normal;
             0.5 * Color2::new(n.x + 1.0, n.y + 1.0, n.z + 1.0)
         },
         None => {
-            let unit_direction: Vec3 = r.dir.normalize();
+            let unit_direction: Vec3 = r.dir.normalize(); //convertir a vector unitari
             let t = 0.5 * (unit_direction.y + 1.0); //mappejar l'intèrval [-1,1] a [0,1]
             (1.0 - t) * Color2::new(1.0, 1.0, 1.0) + t * Color2::new(0.5, 0.7, 1.0)
         }
@@ -52,7 +53,7 @@ fn main() -> std::io::Result<()> {
     settings.ray_depth = ray_depth;
 
     const ASPECT_RATIO: f32 = 16.0 / 9.0;
-    let image_width = 384;
+    let image_width = 384; //384;
     let image_height: i32 = (image_width as f32 / ASPECT_RATIO) as i32;
 
     let mut file = File::create("image.ppm")?;
@@ -71,6 +72,10 @@ fn main() -> std::io::Result<()> {
     let lower_left_corner =
         origin - horitzontal / 2.0 - vertical / 2.0 - Vec3::new(0.0, 0.0, focal_length);
 
+    let mut world = IntersectableList{objects: Vec::<Box<dyn Intersectable>>::new()};
+    world.add(Box::new(Sphere{center: Point32::new(0.0,0.0,-1.0), radius: 0.5}));
+    world.add(Box::new(Sphere{center: Point32::new(0.0,-100.5,-1.0), radius: 100.0}));
+
     //for j in image_height-1..=0 {
     for j in (0..image_height).rev() {
         //println!("{}", j);
@@ -85,7 +90,7 @@ fn main() -> std::io::Result<()> {
                 dir: lower_left_corner + u * horitzontal + v * vertical - origin,
             };
 
-            let pixel_color = ray_color(r);
+            let pixel_color = ray_color(r, &world);
             write_color(&mut image_ascii_data, pixel_color);
         }
     }
