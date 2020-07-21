@@ -33,7 +33,7 @@ impl Intersectable for Sphere {
 
         if discriminant > 0.0 {
             
-            let mut res: Option<HitRecord> = Option::None;
+            //let mut res: Option<HitRecord> = Option::None;
 
             let root = discriminant.sqrt();
             let mut temp = (-half_b - root)/a; //finish solving the equation
