@@ -130,6 +130,7 @@ fn main() -> std::io::Result<()> {
 
     //misc
     let mut rng = rand::thread_rng();
+    
     let distr = Uniform::from(0.0..1.0);
 
     for j in (0..IMAGE_HEIGHT).rev() {
