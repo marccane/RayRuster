@@ -17,9 +17,10 @@ pub fn clamp(x: f32, min: f32, max: f32) -> f32 {
 }
 
 //Vec3 Utils
-#[inline]
+
 //pub fn random_vector(rng: rand::rngs::thread::ThreadRngs) -> Vec3 {
 ///Random Vec3 inside the 1x1x1 box
+#[inline]
 pub fn random_vector() -> Vec3 {
     let mut rng = rand::thread_rng();
     Vec3::new(rng.gen::<f32>(),rng.gen::<f32>(),rng.gen::<f32>())
