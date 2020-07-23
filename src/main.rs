@@ -29,13 +29,16 @@ fn write_color(image_ascii_data: &mut String, pixel_color: &Color2, samples_per_
     image_ascii_data.push_str(&format!("{} {} {}\n", ir, ig, ib));
 }
 
-fn ray_color(r: Ray2, world: &dyn Intersectable) -> Color2 {
+fn ray_color(r: Ray2, world: &dyn Intersectable, depth: i32) -> Color2 {
+    
+    if depth < 0 { return Color2::new(0.0,0.0,0.0); }
 
     let opt_hitrec = world.intersect(&r, 0.0, INFINITY);
 
     match opt_hitrec {
         Some(hit_rec) => {                    
-            //let target = 
+            let target = hit_rec.p + hit_rec.normal + random_in_unit_sphere();
+            0.5 * ray_color(Ray2{origin: hit_rec.p, dir: target - hit_rec.p}, world, depth-1)
         },
         None => {
             let unit_direction: Vec3 = r.dir.normalize(); //convertir a vector unitari
@@ -61,7 +64,8 @@ fn main() -> std::io::Result<()> {
     const ASPECT_RATIO: f32 = 16.0 / 9.0;
     const IMAGE_WIDTH: i32 = 384;
     const IMAGE_HEIGHT: i32 = (IMAGE_WIDTH as f32 / ASPECT_RATIO) as i32;
-    const SAMPLES_PER_PIXEL: i32 = 100;
+    const SAMPLES_PER_PIXEL: i32 = 10;
+    const MAX_DEPTH: i32 = 20;
 
     //world
     let mut world = IntersectableList{objects: Vec::<Box<dyn Intersectable>>::new()};
@@ -85,7 +89,7 @@ fn main() -> std::io::Result<()> {
                 let u = (i as f32 + rng.gen::<f32>()) / (IMAGE_WIDTH - 1) as f32;
                 let v = (j as f32 + rng.gen::<f32>()) / (IMAGE_HEIGHT - 1) as f32;
                 let r = camera.get_ray(u,v);
-                pixel_color += ray_color(r, &world);
+                pixel_color += ray_color(r, &world, MAX_DEPTH);
             }
 
             write_color(&mut image_ascii_data, &pixel_color, SAMPLES_PER_PIXEL);
