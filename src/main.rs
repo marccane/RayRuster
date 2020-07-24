@@ -22,9 +22,10 @@ fn write_color(image_ascii_data: &mut String, pixel_color: &Color2, samples_per_
 
     let scale = 1.0 / samples_per_pixel as f32;
 
-    let ir = (256.0 * clamp(pixel_color.x * scale, 0.0, 0.999)) as i32;
-    let ig = (256.0 * clamp(pixel_color.y * scale, 0.0, 0.999)) as i32;
-    let ib = (256.0 * clamp(pixel_color.z * scale, 0.0, 0.999)) as i32;
+    //Get the average colour of all the samples, gamma correct (p^(1/2)) and convert color to byte 
+    let ir = (256.0 * clamp((pixel_color.x * scale).sqrt(), 0.0, 0.999)) as i32;
+    let ig = (256.0 * clamp((pixel_color.y * scale).sqrt(), 0.0, 0.999)) as i32;
+    let ib = (256.0 * clamp((pixel_color.z * scale).sqrt(), 0.0, 0.999)) as i32;
 
     image_ascii_data.push_str(&format!("{} {} {}\n", ir, ig, ib));
 }
@@ -33,7 +34,7 @@ fn ray_color(r: Ray2, world: &dyn Intersectable, depth: i32) -> Color2 {
     
     if depth < 0 { return Color2::new(0.0,0.0,0.0); }
 
-    let opt_hitrec = world.intersect(&r, 0.0, INFINITY);
+    let opt_hitrec = world.intersect(&r, 0.001, INFINITY);
 
     match opt_hitrec {
         Some(hit_rec) => {                    
@@ -64,8 +65,8 @@ fn main() -> std::io::Result<()> {
     const ASPECT_RATIO: f32 = 16.0 / 9.0;
     const IMAGE_WIDTH: i32 = 384;
     const IMAGE_HEIGHT: i32 = (IMAGE_WIDTH as f32 / ASPECT_RATIO) as i32;
-    const SAMPLES_PER_PIXEL: i32 = 10;
-    const MAX_DEPTH: i32 = 20;
+    const SAMPLES_PER_PIXEL: i32 = 25;
+    const MAX_DEPTH: i32 = 15;
 
     //world
     let mut world = IntersectableList{objects: Vec::<Box<dyn Intersectable>>::new()};
