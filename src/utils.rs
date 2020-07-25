@@ -26,6 +26,13 @@ pub fn random_vector() -> Vec3 {
     Vec3::new(rng.gen::<f32>(),rng.gen::<f32>(),rng.gen::<f32>())
 }
 
+#[inline]
+pub fn random_double(min: f32, max: f32) -> f32 {
+    let mut rng = rand::thread_rng();
+    let distr = Uniform::from(min..max);
+    distr.sample(&mut rng)
+}
+
 pub fn random_vector_range(min: f32, max: f32) -> Vec3 {
     let mut rng = rand::thread_rng();
     let distr = Uniform::from(min..max);
@@ -39,4 +46,11 @@ pub fn random_in_unit_sphere() -> Vec3 {
             return res;
         }
     }
+}
+
+pub fn random_unit_vector() -> Vec3 {
+    let a = random_double(0.0, 2.0*PI);
+    let z = random_double(-1.0, 1.0);
+    let r = (1.0-z*z).sqrt();
+    Vec3::new(r*a.cos(), r*a.sin(), z)
 }

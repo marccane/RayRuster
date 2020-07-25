@@ -38,7 +38,7 @@ fn ray_color(r: Ray2, world: &dyn Intersectable, depth: i32) -> Color2 {
 
     match opt_hitrec {
         Some(hit_rec) => {                    
-            let target = hit_rec.p + hit_rec.normal + random_in_unit_sphere();
+            let target = hit_rec.p + hit_rec.normal + random_unit_vector();
             0.5 * ray_color(Ray2{origin: hit_rec.p, dir: target - hit_rec.p}, world, depth-1)
         },
         None => {
@@ -65,8 +65,8 @@ fn main() -> std::io::Result<()> {
     const ASPECT_RATIO: f32 = 16.0 / 9.0;
     const IMAGE_WIDTH: i32 = 384;
     const IMAGE_HEIGHT: i32 = (IMAGE_WIDTH as f32 / ASPECT_RATIO) as i32;
-    const SAMPLES_PER_PIXEL: i32 = 25;
-    const MAX_DEPTH: i32 = 15;
+    const SAMPLES_PER_PIXEL: i32 = 100;
+    const MAX_DEPTH: i32 = 50;
 
     //world
     let mut world = IntersectableList{objects: Vec::<Box<dyn Intersectable>>::new()};
