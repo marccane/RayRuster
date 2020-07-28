@@ -123,15 +123,16 @@ fn main() -> std::io::Result<()> {
 
             canvas.render(move |mouse, image| {
                 let width = image.width() as usize;
+                let scale = 1.0 / SAMPLES_PER_PIXEL as f32;
                 for (y, row) in image.chunks_mut(width).enumerate() {
                     for (x, pixel) in row.iter_mut().enumerate() {
                         let buffer = &raytraced_color_buffer;
-                        match buffer.get(IMAGE_WIDTH as usize * y + x) {
+                        match buffer.get(IMAGE_WIDTH as usize * (IMAGE_HEIGHT as usize - y) + x) {
                             Some(color) => {
                                 *pixel = pixel_canvas::Color {
-                                    r: (color.x*256.0) as u8,
-                                    g: (color.y*256.0) as u8,
-                                    b: (color.z*256.0) as u8,
+                                    r: (255.0 * color.x * scale) as u8,
+                                    g: (255.0 * color.y * scale) as u8,
+                                    b: (255.0 * color.z * scale) as u8,
                                 }
                             }
                             _ => (),
