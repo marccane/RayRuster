@@ -16,16 +16,16 @@ use pixel_canvas::{Canvas, Color};
 
 use rayruster::raytracing::{Ray2, Vec3, Color2, Point32, Intersectable, IntersectableList, Camera};
 use rayruster::figures::*;
-use rayruster::{settings, utils::*};
+use rayruster::{materials::*, settings, utils::*};
 
 fn write_color(image_ascii_data: &mut String, pixel_color: &Color2, samples_per_pixel: i32) {
 
     let scale = 1.0 / samples_per_pixel as f32;
 
     //Get the average colour of all the samples, gamma correct (p^(1/2)) and convert color to byte 
-    let ir = (256.0 * clamp((pixel_color.x * scale).sqrt(), 0.0, 0.999)) as i32;
-    let ig = (256.0 * clamp((pixel_color.y * scale).sqrt(), 0.0, 0.999)) as i32;
-    let ib = (256.0 * clamp((pixel_color.z * scale).sqrt(), 0.0, 0.999)) as i32;
+    let ir = (256.0 * clamp((pixel_color.x * scale).sqrt(), 0.0, 0.999)) as u8;
+    let ig = (256.0 * clamp((pixel_color.y * scale).sqrt(), 0.0, 0.999)) as u8;
+    let ib = (256.0 * clamp((pixel_color.z * scale).sqrt(), 0.0, 0.999)) as u8;
 
     image_ascii_data.push_str(&format!("{} {} {}\n", ir, ig, ib));
 }
@@ -38,8 +38,17 @@ fn ray_color(r: Ray2, world: &dyn Intersectable, depth: i32) -> Color2 {
 
     match opt_hitrec {
         Some(hit_rec) => {                    
-            let target = hit_rec.p + hit_rec.normal + random_unit_vector();
-            0.5 * ray_color(Ray2{origin: hit_rec.p, dir: target - hit_rec.p}, world, depth-1)
+            /*let target = hit_rec.p + hit_rec.normal + random_unit_vector();
+            0.5 * ray_color(Ray2{origin: hit_rec.p, dir: target - hit_rec.p}, world, depth-1)*/
+            let scatter_res = hit_rec.material.scatter(r, hit_rec);
+            match scatter_res {
+                Some((attenuation, scattered)) => {
+                    let aten = attenuation;
+                    let bounce = ray_color(scattered, world, depth-1);
+                    Color2::new(aten.x*bounce.x, aten.y*bounce.y, aten.z*bounce.z)
+                },
+                None => Color2::new(0.0,0.0,0.0)
+            }            
         },
         None => {
             let unit_direction: Vec3 = r.dir.normalize(); //convertir a vector unitari
@@ -65,13 +74,20 @@ fn main() -> std::io::Result<()> {
     const ASPECT_RATIO: f32 = 16.0 / 9.0;
     const IMAGE_WIDTH: i32 = 384;
     const IMAGE_HEIGHT: i32 = (IMAGE_WIDTH as f32 / ASPECT_RATIO) as i32;
-    const SAMPLES_PER_PIXEL: i32 = 100;
-    const MAX_DEPTH: i32 = 50;
-
+    const SAMPLES_PER_PIXEL: i32 = 50;
+    const MAX_DEPTH: i32 = 10;
+    
     //world
+    let mat_ground = Lambertian{albedo: Color2::new(0.8, 0.8, 0.0)};
+    let mat_center = Lambertian{albedo: Color2::new(0.7, 0.3, 0.3)};
+    let mat_left = Metal::new(Color2::new(0.8, 0.8, 0.8));
+    let mat_right = Metal::new(Color2::new(0.8, 0.6, 0.2));
+    
     let mut world = IntersectableList{objects: Vec::<Box<dyn Intersectable>>::new()};
-    world.add(Box::new(Sphere{center: Point32::new(0.0,0.0,-1.0), radius: 0.5}));
-    world.add(Box::new(Sphere{center: Point32::new(0.0,-100.5,-1.0), radius: 100.0}));
+    world.add(Box::new(Sphere{center: Point32::new(0.0,-100.5,-1.0), radius: 100.0, material: &mat_ground}));
+    world.add(Box::new(Sphere{center: Point32::new(0.0,0.0,-1.0), radius: 0.5, material: &mat_center}));
+    world.add(Box::new(Sphere{center: Point32::new(-1.0,0.0,-1.0), radius: 0.5, material: &mat_left}));
+    world.add(Box::new(Sphere{center: Point32::new(1.0,0.0,-1.0), radius: 0.5, material: &mat_right}));
 
     //camera
     let camera = Camera::new();
@@ -129,6 +145,7 @@ fn main() -> std::io::Result<()> {
     
 
     Ok(())
+
 }
 
 fn process_cli_parameters() -> (settings::DisplayMode, i8, i16, i16) {

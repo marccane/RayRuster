@@ -1,28 +1,31 @@
-use crate::raytracing::{Intersectable, Ray2, Point32, HitRecord};
+use crate::raytracing::*;
+use crate::materials::*;
 use cgmath::prelude::InnerSpace;
 
-pub struct Sphere {
+pub struct Sphere<'a> {
     pub center: Point32,
     pub radius: f32,
+    pub material: &'a dyn Material,
 }
 
-impl Sphere {  
+impl<'a> Sphere<'a> {  
     //Creates a Sphere given its center and radius.
-    pub fn new(center: Point32, radius: f32) -> Sphere {
+    pub fn new(center: Point32, radius: f32, material: &'a dyn Material) -> Sphere {
         Sphere {
-            center: center,
-            radius: radius,
+            center,
+            radius,
+            material,
         }
     }
     
     //Creates a Sphere of radius 1 centered on the origin (0,0,0)
-    pub fn new_default() -> Sphere {
-        Sphere::new(Point32::new(0.0,0.0,0.0), 1.0)
-    }
+    /*pub fn new_default() -> Sphere<'a> {
+        Sphere::new(Point32::new(0.0,0.0,0.0), 1.0, &Lambertian{albedo: Color2::new(0.5,0.5,0.5)})
+    }*/
 
 }
 
-impl Intersectable for Sphere {
+impl<'a> Intersectable for Sphere<'a> {
 
     fn intersect(&self, ray: &Ray2, t_min: f32, t_max:f32) -> Option<HitRecord> {
         let oc = ray.origin - self.center;
@@ -39,7 +42,7 @@ impl Intersectable for Sphere {
             let mut temp = (-half_b - root)/a; //finish solving the equation
             if temp < t_max && temp > t_min {
                 let p = ray.at(temp);
-                let mut hit_rec = HitRecord::new_with_point_and_t(p, temp);
+                let mut hit_rec = HitRecord::new_with_point_and_t(p, temp, self.material);
                 let outward_normal = (hit_rec.p - self.center) / self.radius;
                 hit_rec.set_face_normal(ray, outward_normal);
                 return Some(hit_rec);
@@ -47,7 +50,7 @@ impl Intersectable for Sphere {
             temp = (-half_b + root)/a;
             if temp > t_max && temp < t_min {
                 let p = ray.at(temp);
-                let mut hit_rec = HitRecord::new_with_point_and_t(p, temp);
+                let mut hit_rec = HitRecord::new_with_point_and_t(p, temp, self.material);
                 let outward_normal = (hit_rec.p - self.center) / self.radius;
                 hit_rec.set_face_normal(ray, outward_normal);
                 return Some(hit_rec);

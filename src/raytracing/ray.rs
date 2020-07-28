@@ -8,6 +8,10 @@ pub struct Ray2 {
 }
 
 impl Ray2 {
+    pub fn new(origin: Point32, dir: Vec3) -> Self {
+        Self{origin, dir}
+    }
+
     pub fn at(&self, t: f32) -> Point32 {
         self.origin + t * self.dir
     }

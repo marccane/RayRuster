@@ -54,3 +54,13 @@ pub fn random_unit_vector() -> Vec3 {
     let r = (1.0-z*z).sqrt();
     Vec3::new(r*a.cos(), r*a.sin(), z)
 }
+
+pub fn random_in_hemisphere(normal: Vec3) -> Vec3 {
+    let in_unit_sphere = random_in_unit_sphere();
+    if in_unit_sphere.dot(normal) > 0.0 {
+        in_unit_sphere
+    }
+    else {
+        -in_unit_sphere
+    }
+}

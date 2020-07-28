@@ -1,10 +1,10 @@
 use super::{Intersectable, HitRecord, Ray2};
 
-pub struct IntersectableList { 
-    pub objects: Vec<Box<dyn Intersectable>>,
+pub struct IntersectableList<'a> { 
+    pub objects: Vec<Box<dyn Intersectable +'a>>,
 }
 
-impl Intersectable for IntersectableList {
+impl Intersectable for IntersectableList<'_> {
     fn intersect(&self, ray: &Ray2, t_min: f32, t_max:f32) -> Option<HitRecord> {
         let mut result: Option<HitRecord> = None;
         //let mut hit_anything = false;
@@ -23,8 +23,8 @@ impl Intersectable for IntersectableList {
     }
 }
 
-impl IntersectableList {
-    pub fn add(&mut self, obj: Box<dyn Intersectable>) {
+impl<'a> IntersectableList<'a> {
+    pub fn add(&mut self, obj: Box<dyn Intersectable + 'a>) {
         self.objects.push(obj);
     }
     
