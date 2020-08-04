@@ -20,8 +20,8 @@ impl Material for Metal {
 }
 
 impl Metal {
-    pub fn new(albedo: Color2) -> Self {
-        Self{albedo}
+    pub fn new(albedo: Color2) -> Metal {
+        Metal{albedo}
     }
 }
 

@@ -58,6 +58,8 @@ fn ray_color(r: Ray2, world: &dyn Intersectable, depth: i32) -> Color2 {
     }
 }
 
+use rayon::prelude::*;
+
 fn main() -> std::io::Result<()> {
 
     // Settings retreive from run parameters.
@@ -94,8 +96,36 @@ fn main() -> std::io::Result<()> {
 
     //misc
     let mut rng = rand::thread_rng();
+    const NUM_PIXELS: usize = (IMAGE_WIDTH * IMAGE_HEIGHT) as usize;
+    let mut pixel_col_vec = vec![(0, None); NUM_PIXELS]; //i32, Option::<Color2>
+    
+    for i in 0..NUM_PIXELS {
+        pixel_col_vec[i] = (i, None);
+    }
+    pixel_col_vec[0] = (0, Some(Color2::new(0.0,0.0,0.0)));
+    
+    pixel_col_vec.par_iter_mut().for_each(|t| {
+        let (pixelidx, _) = *t;
+        let i = pixelidx as i32 % IMAGE_WIDTH;
+        let j = pixelidx as i32/ IMAGE_WIDTH;
+        let mut rng = rand::thread_rng();
+        
+        let mut pixel_color = Color2::new(0.0,0.0,0.0);
+        for s in 0..SAMPLES_PER_PIXEL {
+            let u = (i as f32 + rng.gen::<f32>()) / (IMAGE_WIDTH - 1) as f32;
+            let v = (j as f32 + rng.gen::<f32>()) / (IMAGE_HEIGHT - 1) as f32;
+            let r = camera.get_ray(u,v);
+            pixel_color += ray_color(r, &world, MAX_DEPTH);
+        }
+        
+        *t = (0, Some(pixel_color));
+        
+        //let mut rng = thread_rng();
+        //*p = (0..5).map(|_| rng.sample(&Alphanumeric)).collect()
+        
+    });
 
-    for j in (0..IMAGE_HEIGHT).rev() {
+    /*for j in (0..IMAGE_HEIGHT).rev() {
         //println!("{}", j);
         //println!("\rScanlines remaining: {} ", j); //commented out while the \r thing doesn't work
         std::io::stdout().flush().expect("error flushing stdout");
@@ -112,6 +142,11 @@ fn main() -> std::io::Result<()> {
             write_color(&mut image_ascii_data, &pixel_color, SAMPLES_PER_PIXEL);
             raytraced_color_buffer.push(pixel_color);
         }
+    }*/
+    
+    for tpl in pixel_col_vec {
+        let (_, opt_pix_col) = tpl;
+        write_color(&mut image_ascii_data, &opt_pix_col.unwrap(), SAMPLES_PER_PIXEL);
     }
 
     file.write_all(image_ascii_data.as_bytes())?;
