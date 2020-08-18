@@ -80,10 +80,14 @@ fn main() -> std::io::Result<()> {
     const MAX_DEPTH: i32 = 10;
     
     //world
+    let test = Dielectric::new(0.5);
     let mat_ground = Lambertian{albedo: Color2::new(0.8, 0.8, 0.0)};
-    let mat_center = Lambertian{albedo: Color2::new(0.7, 0.3, 0.3)};
-    let mat_left = Metal::new(Color2::new(0.8, 0.8, 0.8));
-    let mat_right = Metal::new(Color2::new(0.8, 0.6, 0.2));
+    //let mat_center = Lambertian{albedo: Color2::new(0.7, 0.3, 0.3)};
+    //let mat_left = Metal::new(Color2::new(0.8, 0.8, 0.8));
+    //let mat_right = Metal::new(Color2::new(0.8, 0.6, 0.2));
+    let mat_left = Dielectric::new(0.0);
+    let mat_center = Dielectric::new(0.5);
+    let mat_right = Dielectric::new(1.0);
     
     let mut world = IntersectableList{objects: Vec::<Box<dyn Intersectable>>::new()};
     world.add(Box::new(Sphere{center: Point32::new(0.0,-100.5,-1.0), radius: 100.0, material: &mat_ground}));
