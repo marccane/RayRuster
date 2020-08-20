@@ -20,14 +20,12 @@ use rayruster::{materials::*, settings, utils::*};
 
 use rayon::prelude::*;
 
-fn write_color(image_ascii_data: &mut String, pixel_color: &Color2, samples_per_pixel: i32) {
+fn write_color(image_ascii_data: &mut String, pixel_color: &Color2) {
 
-    let scale = 1.0 / samples_per_pixel as f32;
-
-    //Get the average colour of all the samples, gamma correct (p^(1/2)) and convert color to byte 
-    let ir = (256.0 * clamp((pixel_color.x * scale).sqrt(), 0.0, 0.999)) as u8;
-    let ig = (256.0 * clamp((pixel_color.y * scale).sqrt(), 0.0, 0.999)) as u8;
-    let ib = (256.0 * clamp((pixel_color.z * scale).sqrt(), 0.0, 0.999)) as u8;
+    //Convert color to byte 
+    let ir = (256.0 * pixel_color.x) as u8;
+    let ig = (256.0 * pixel_color.y) as u8;
+    let ib = (256.0 * pixel_color.z) as u8;
 
     image_ascii_data.push_str(&format!("{} {} {}\n", ir, ig, ib));
 }
@@ -65,12 +63,6 @@ fn main() -> std::io::Result<()> {
     // Settings retreive from run parameters.
     let settings = get_settings_from_run_parameters();
 
-    //output
-    let mut file = File::create("image.ppm")?;
-    let mut image_ascii_data: String = "".to_owned();
-    let header = format!("P3\n{} {}\n255\n", IMAGE_WIDTH, IMAGE_HEIGHT);
-    image_ascii_data.push_str(&header);
-
     //image
     const ASPECT_RATIO: f32 = 16.0 / 9.0;
     const IMAGE_WIDTH: usize = 400;
@@ -106,27 +98,25 @@ fn main() -> std::io::Result<()> {
         let i = pixelidx % IMAGE_WIDTH;
         let j = pixelidx / IMAGE_WIDTH;
         let mut rng = rand::thread_rng();
+        let scale = 1.0 / SAMPLES_PER_PIXEL as f32;
         
-        let mut pixel_color = Color2::new(0.0,0.0,0.0);
+        let mut acc_pixel_color = Color2::new(0.0,0.0,0.0);
         for s in 0..SAMPLES_PER_PIXEL {
             let u = (i as f32 + rng.gen::<f32>()) / (IMAGE_WIDTH - 1) as f32;
             let v = (j as f32 + rng.gen::<f32>()) / (IMAGE_HEIGHT - 1) as f32;
             let r = camera.get_ray(u,v);
-            pixel_color += ray_color(r, &world, MAX_DEPTH);
+            acc_pixel_color += ray_color(r, &world, MAX_DEPTH);
         }
+
+        //Get the average colour of all the samples and gamma correct (p^(1/2))
+        let pixel_color = Color2::new(
+            clamp((acc_pixel_color.x * scale).sqrt(), 0.0, 0.999),
+            clamp((acc_pixel_color.y * scale).sqrt(), 0.0, 0.999),
+            clamp((acc_pixel_color.z * scale).sqrt(), 0.0, 0.999),
+        );
         
         *t = (0, Some(pixel_color));
     });
-    
-
-    for i in (0..IMAGE_HEIGHT).rev() {
-        for j in 0..IMAGE_WIDTH {
-            let (_, opt_pix_col) = pixel_col_vec[i*IMAGE_WIDTH + j];
-            write_color(&mut image_ascii_data, &opt_pix_col.unwrap(), SAMPLES_PER_PIXEL);
-        }
-    }
-
-    file.write_all(image_ascii_data.as_bytes())?;
     
     match settings.display_mode { 
         settings::DisplayMode::WINDOW => {
@@ -142,20 +132,32 @@ fn main() -> std::io::Result<()> {
                         let color = opt_pix_col.unwrap();
 
                         *pixel = pixel_canvas::Color {
-                            r: (255.999 * (color.x * scale).sqrt()) as u8,
-                            g: (255.999 * (color.y * scale).sqrt()) as u8,
-                            b: (255.999 * (color.z * scale).sqrt()) as u8,
+                            r: (256.0 * color.x) as u8,
+                            g: (256.0 * color.y) as u8,
+                            b: (256.0 * color.z) as u8,
                         }
                     }
                 }
             });
         }
-        _ => (),
+        settings::DisplayMode::FILE => {
+            let mut file = File::create("image.ppm")?;
+            let mut image_ascii_data: String = "".to_owned();
+            let header = format!("P3\n{} {}\n255\n", IMAGE_WIDTH, IMAGE_HEIGHT);
+            image_ascii_data.push_str(&header);
+
+            for i in (0..IMAGE_HEIGHT).rev() {
+                for j in 0..IMAGE_WIDTH {
+                    let (_, opt_pix_col) = pixel_col_vec[i*IMAGE_WIDTH + j];
+                    write_color(&mut image_ascii_data, &opt_pix_col.unwrap());
+                }
+            }
+
+            file.write_all(image_ascii_data.as_bytes())?;
+        },
     }
-    
 
     Ok(())
-
 }
 
 fn process_cli_parameters() -> (settings::DisplayMode, i8, i16, i16) {
