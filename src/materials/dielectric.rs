@@ -14,12 +14,7 @@ impl Material for Dielectric {
 		let refracted = refract(unit_direction, &rec.normal, etai_over_etat);
 		
         let scattered = Ray2::new(rec.p, refracted);
-        if scattered.dir.dot(rec.normal) > 0.0 {
-            Some((attenuation, scattered))
-        }
-        else {
-            None
-        }
+        Some((attenuation, scattered))
     }
 }
 

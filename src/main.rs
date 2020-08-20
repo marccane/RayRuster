@@ -50,7 +50,7 @@ fn ray_color(r: Ray2, world: &dyn Intersectable, depth: i32) -> Color2 {
                     Color2::new(aten.x*bounce.x, aten.y*bounce.y, aten.z*bounce.z)
                 },
                 None => Color2::new(0.0,0.0,0.0)
-            }            
+            } 
         },
         None => {
             let unit_direction: Vec3 = r.dir.normalize(); //convertir a vector unitari
@@ -64,7 +64,6 @@ fn main() -> std::io::Result<()> {
 
     // Settings retreive from run parameters.
     let settings = get_settings_from_run_parameters();
-    let mut raytraced_color_buffer: Vec<Color2> = vec!();
 
     //output
     let mut file = File::create("image.ppm")?;
@@ -74,20 +73,16 @@ fn main() -> std::io::Result<()> {
 
     //image
     const ASPECT_RATIO: f32 = 16.0 / 9.0;
-    const IMAGE_WIDTH: usize = 384;
+    const IMAGE_WIDTH: usize = 400;
     const IMAGE_HEIGHT: usize = (IMAGE_WIDTH as f32 / ASPECT_RATIO) as usize;
     const SAMPLES_PER_PIXEL: i32 = 50;
     const MAX_DEPTH: i32 = 10;
     
     //world
-    let test = Dielectric::new(0.5);
     let mat_ground = Lambertian{albedo: Color2::new(0.8, 0.8, 0.0)};
-    //let mat_center = Lambertian{albedo: Color2::new(0.7, 0.3, 0.3)};
-    //let mat_left = Metal::new(Color2::new(0.8, 0.8, 0.8));
-    //let mat_right = Metal::new(Color2::new(0.8, 0.6, 0.2));
-    let mat_left = Dielectric::new(0.0);
-    let mat_center = Dielectric::new(0.5);
-    let mat_right = Dielectric::new(1.0);
+    let mat_right = Metal::new(Color2::new(0.8, 0.6, 0.2));
+    let mat_left = Dielectric::new(5.0);
+    let mat_center = Dielectric::new(1.5);
     
     let mut world = IntersectableList{objects: Vec::<Box<dyn Intersectable>>::new()};
     world.add(Box::new(Sphere{center: Point32::new(0.0,-100.5,-1.0), radius: 100.0, material: &mat_ground}));
@@ -105,7 +100,6 @@ fn main() -> std::io::Result<()> {
     for i in 0..NUM_PIXELS {
         pixel_col_vec[i] = (i, None);
     }
-    //pixel_col_vec[0] = (0, Some(Color2::new(0.0,0.0,0.0)));
     
     pixel_col_vec.par_iter_mut().for_each(|t| {
         let (pixelidx, _) = *t;
@@ -144,17 +138,14 @@ fn main() -> std::io::Result<()> {
                 let scale = 1.0 / SAMPLES_PER_PIXEL as f32;
                 for (y, row) in image.chunks_mut(width).enumerate() {
                     for (x, pixel) in row.iter_mut().enumerate() {
-                        let buffer = &raytraced_color_buffer;
-                        match buffer.get(IMAGE_WIDTH as usize * (IMAGE_HEIGHT as usize - y) + x) {
-                            Some(color) => {
-                                *pixel = pixel_canvas::Color {
-                                    r: (255.0 * color.x * scale) as u8,
-                                    g: (255.0 * color.y * scale) as u8,
-                                    b: (255.0 * color.z * scale) as u8,
-                                }
-                            }
-                            _ => (),
-                        };
+                        let (_, opt_pix_col) = pixel_col_vec[IMAGE_WIDTH as usize * y + x];
+                        let color = opt_pix_col.unwrap();
+
+                        *pixel = pixel_canvas::Color {
+                            r: (255.999 * (color.x * scale).sqrt()) as u8,
+                            g: (255.999 * (color.y * scale).sqrt()) as u8,
+                            b: (255.999 * (color.z * scale).sqrt()) as u8,
+                        }
                     }
                 }
             });
